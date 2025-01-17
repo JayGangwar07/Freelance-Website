@@ -79,6 +79,11 @@
             cursor: pointer;
             font-size: 2rem;
             transition: color 0.3s ease;
+            background: linear-gradient(to right, #c084fc, #818cf8);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            animation: glowText 3s infinite alternate;
         }
 
         .scroll-indicator:hover {
@@ -292,7 +297,7 @@
             <h1>Minecraft 1.22</h1>
             <p>A New Chapter Begins</p>
         </div>
-        <div class="scroll-indicator">⌄</div>
+        <div class="scroll-indicator">↓</div>
     </div>
 
     <section class="features">
