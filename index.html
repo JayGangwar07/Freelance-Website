@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minecraft 1.22</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            background-color: #111827;
+            color: white;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .hero {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            position: relative;
+            background: linear-gradient(to bottom, #1a1f35, #111827);
+            overflow: hidden;
+        }
+
+        .floating-blocks {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        .block {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            background: rgba(255, 255, 255, 0.1);
+            animation: float 15s infinite linear;
+            opacity: 0;
+        }
+
+        .hero-content {
+            max-width: 800px;
+            padding: 0 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero h1 {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(to right, #c084fc, #818cf8);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            animation: glowText 3s infinite alternate;
+        }
+
+        .hero p {
+            font-size: 1.5rem;
+            color: #e5e7eb;
+            margin-bottom: 2rem;
+            animation: fadeInUp 1s ease-out;
+        }
+
+        .scroll-indicator {
+            position: absolute;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            animation: bounce 2s infinite;
+            cursor: pointer;
+            font-size: 2rem;
+            transition: color 0.3s ease;
+        }
+
+        .scroll-indicator:hover {
+            color: #c084fc;
+        }
+
+        .features {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 4rem 20px;
+            position: relative;
+        }
+
+        .features h2 {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 3rem;
+            color: #e5e7eb;
+            animation: fadeInUp 1s ease-out;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        .feature-card {
+            background: #1f2937;
+            border-radius: 0.5rem;
+            padding: 2rem;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, transparent, rgba(192, 132, 252, 0.1), transparent);
+            transform: translateX(-100%);
+            transition: transform 0.6s;
+        }
+
+        .feature-card:hover::before {
+            transform: translateX(100%);
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .feature-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: #c084fc;
+            position: relative;
+            transition: transform 0.3s ease;
+        }
+
+        .feature-card:hover h3 {
+            transform: scale(1.05);
+        }
+
+        .feature-card p {
+            color: #9ca3af;
+            transform: translateY(0);
+            transition: transform 0.3s ease;
+        }
+
+        .feature-card .details {
+            margin-top: 1rem;
+            height: 0;
+            overflow: hidden;
+            transition: height 0.3s ease, opacity 0.3s ease;
+            opacity: 0;
+        }
+
+        .feature-card.active .details {
+            height: auto;
+            padding-top: 1rem;
+            opacity: 1;
+        }
+
+        .cta {
+            text-align: center;
+            padding: 4rem 20px;
+            background: #1f2937;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cta::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(to right, transparent, #c084fc, transparent);
+            animation: shimmer 2s infinite;
+        }
+
+        .cta h2 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            animation: fadeInUp 1s ease-out;
+        }
+
+        .cta-button {
+            background: #7c3aed;
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 0.5rem;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cta-button::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, transparent 50%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .cta-button:hover {
+            background: #6d28d9;
+            transform: translateY(-2px);
+        }
+
+        .cta-button:hover::after {
+            opacity: 1;
+        }
+
+        .cta-button:active {
+            transform: translateY(1px);
+        }
+
+        @keyframes float {
+            0% {
+                transform: translate(0, 100vh) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.5;
+            }
+            90% {
+                opacity: 0.5;
+            }
+            100% {
+                transform: translate(0, -100px) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        @keyframes glowText {
+            0% {
+                text-shadow: 0 0 10px rgba(192, 132, 252, 0.5);
+            }
+            100% {
+                text-shadow: 0 0 20px rgba(192, 132, 252, 0.8);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 3rem; }
+            .features h2 { font-size: 2rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="hero">
+        <div class="floating-blocks"></div>
+        <div class="hero-content">
+            <h1>Minecraft 1.22</h1>
+            <p>A New Chapter Begins</p>
+        </div>
+        <div class="scroll-indicator">⌄</div>
+    </div>
+
+    <section class="features">
+        <h2>What's New</h2>
+        <div class="feature-grid">
+            <div class="feature-card">
+                <h3>Bundles</h3>
+                <p>After four years of anticipation, Bundles are finally here! These versatile storage items can be crafted and dyed to organize your inventory in style.</p>
+                <div class="details">
+                    <p>Store multiple item types in a single slot. Perfect for early-game inventory management and resource gathering.</p>
+                </div>
+            </div>
+            <div class="feature-card">
+                <h3>Hardcore Mode for Bedrock</h3>
+                <p>The ultimate challenge comes to Bedrock Edition. One life, no respawns - do you have what it takes?</p>
+                <div class="details">
+                    <p>Experience the intense gameplay that Java players have enjoyed for years. Perfect for veterans seeking a new challenge.</p>
+                </div>
+            </div>
+            <div class="feature-card">
+                <h3>Pale Garden Update</h3>
+                <p>Discover the ethereal beauty of white wood and enhanced moss mechanics in the new Pale Garden biome.</p>
+                <div class="details">
+                    <p>Craft with the new white wood type and explore unique moss carpet features in this mystical new addition.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="cta">
+        <h2>Ready to Explore?</h2>
+        <p>Update your game to experience these exciting new features</p>
+        <button class="cta-button">Update Now</button>
+    </section>
+
+    <script>
+        // Create floating blocks in hero section
+        const floatingBlocks = document.querySelector('.floating-blocks');
+        for (let i = 0; i < 20; i++) {
+            const block = document.createElement('div');
+            block.className = 'block';
+            block.style.left = `${Math.random() * 100}%`;
+            block.style.animationDelay = `${Math.random() * 15}s`;
+            floatingBlocks.appendChild(block);
+        }
+
+        // Feature card interaction
+        document.querySelectorAll('.feature-card').forEach(card => {
+            card.addEventListener('click', () => {
+                const wasActive = card.classList.contains('active');
+                
+                document.querySelectorAll('.feature-card').forEach(c => {
+                    c.classList.remove('active');
+                });
+                
+                if (!wasActive) {
+                    card.classList.add('active');
+                }
+            });
+        });
+
+        // Smooth scroll
+        document.querySelector('.scroll-indicator').addEventListener('click', () => {
+            window.scrollTo({
+                top: window.innerHeight,
+                behavior: 'smooth'
+            });
+        });
+
+        // Intersection Observer for fade-in animations
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.feature-card').forEach(card => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(20px)';
+            card.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+            observer.observe(card);
+        });
+
+        // Parallax effect on scroll
+        window.addEventListener('scroll', () => {
+            const scrolled = window.pageYOffset;
+            document.querySelectorAll('.floating-blocks .block').forEach(block => {
+                const speed = 0.5;
+                block.style.transform = `translateY(${scrolled * speed}px)`;
+            });
+        });
+    </script>
+</body>
+                                                                       </html>
